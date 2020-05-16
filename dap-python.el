@@ -176,15 +176,17 @@ as the pyenv version then also return nil. This works around https://github.com/
   (interactive)
   (dap-debug (dap-python--template "Python :: Run pytest (at point)")))
 
+(defun dap-python--debug-test-buffer ()
+  (interactive)
+  (dap-debug (dap-python--template "Python :: Run pytest (buffer)")))
+
 (defun dap-python--populate-start-file-args (conf)
   "Populate CONF with the required arguments."
   (let* ((host "localhost")
          (debug-port (dap--find-available-port))
          (python-executable (dap-python--pyenv-executable-find dap-python-executable))
          (python-args (or (plist-get conf :args) ""))
-         (program (or (plist-get conf :target-module)
-                      (plist-get conf :program)
-                      (buffer-file-name)))
+         (program (buffer-file-name))
          (module (plist-get conf :module)))
 
     (plist-put conf :program-to-start
@@ -198,9 +200,13 @@ as the pyenv version then also return nil. This works around https://github.com/
                        python-args))
     (plist-put conf :program program)
     (plist-put conf :debugServer debug-port)
+    (plist-put conf :module "pytest")
+    (plist-put conf :args "")
+    (plist-put conf :request "launch")
     (plist-put conf :port debug-port)
     (plist-put conf :hostName host)
     (plist-put conf :host host)
+    (plist-put conf :cwd (lsp-workspace-root))
     conf))
 
 (defun dap-python--populate-test-at-point (conf)
@@ -224,36 +230,28 @@ as the pyenv version then also return nil. This works around https://github.com/
     (plist-put conf :program program)
     (plist-put conf :debugServer debug-port)
     (plist-put conf :port debug-port)
+    (plist-put conf :module "pytest")
+    (plist-put conf :args "")
+    (plist-put conf :request "launch")
     (plist-put conf :hostName host)
     (plist-put conf :host host)
     (plist-put conf :cwd (lsp-workspace-root))
     conf))
 
+
 (dap-register-debug-provider "python" 'dap-python--populate-start-file-args)
 (dap-register-debug-template "Python :: Run file (buffer)"
                              (list :type "python"
-                                   :args ""
-                                   :cwd nil
                                    :module nil
-                                   :program nil
-                                   :request "launch"
                                    :name "Python :: Run file (buffer)"))
 
 (dap-register-debug-template "Python :: Run pytest (buffer)"
                              (list :type "python"
-                                   :args ""
-                                   :cwd nil
-                                   :program nil
-                                   :module "pytest"
-                                   :request "launch"
                                    :name "Python :: Run pytest (buffer)"))
 
 (dap-register-debug-provider "python-test-at-point" 'dap-python--populate-test-at-point)
 (dap-register-debug-template "Python :: Run pytest (at point)"
 			     (list :type "python-test-at-point"
-				   :args ""
-				   :module "pytest"
-				   :request "launch"
 				   :name "Python :: Run pytest (at point)"))
 
 (provide 'dap-python)
