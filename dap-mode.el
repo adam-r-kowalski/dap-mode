@@ -1651,6 +1651,11 @@ point is set."
             (funcall mode -1))))
     (dap-ui-many-windows-mode -1))))
 
+(defun dap--template (template-name)
+  (->> dap-debug-template-configurations
+       (-first (-lambda ((name)) (string-equal name template-name)))
+       cdr))
+
 (provide 'dap-mode)
 ;;; dap-mode.el ends here
 

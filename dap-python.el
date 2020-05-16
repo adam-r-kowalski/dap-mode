@@ -167,18 +167,13 @@ as the pyenv version then also return nil. This works around https://github.com/
        (dap-python--symbols-before-point (dap-python--cursor-position))
        dap-python--nearest-test))
 
-(defun dap-python--template (template-name)
-  (->> dap-debug-template-configurations
-       (-first (-lambda ((name)) (dap-python--equal name template-name)))
-       cdr))
-
 (defun dap-python--debug-test-at-point ()
   (interactive)
-  (dap-debug (dap-python--template "Python :: Run pytest (at point)")))
+  (dap-debug (dap--template "Python :: Run pytest (at point)")))
 
 (defun dap-python--debug-test-buffer ()
   (interactive)
-  (dap-debug (dap-python--template "Python :: Run pytest (buffer)")))
+  (dap-debug (dap--template "Python :: Run pytest (buffer)")))
 
 (defun dap-python--populate-start-file-args (conf)
   "Populate CONF with the required arguments."
